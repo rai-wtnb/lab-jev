@@ -43,7 +43,7 @@ func main() {
 
 	exutil.Title("Three question types in one request")
 	res := exutil.Timed("latency", func() (*typesafe.Response, error) { return c.SystemOne(ctx, state, questions) })
-	exutil.Response(res)
+	exutil.PrintResponse(res)
 
 	// Nine extra Nouls (12 questions total).
 	more := map[string]string{
@@ -84,5 +84,5 @@ func main() {
 
 	exutil.Title("Answers to all 12 questions")
 	res = exutil.Timed("latency", func() (*typesafe.Response, error) { return c.SystemOne(ctx, state, many) })
-	exutil.Response(res)
+	exutil.PrintResponse(res)
 }

@@ -56,7 +56,7 @@ func main() {
 	sc.RefundPolicy = "Duplicate charges are eligible for a refund."
 
 	exutil.Title("Object state + `path` references")
-	exutil.JSON("state", sc)
+	exutil.PrintJSON("state", sc)
 	res, err := c.SystemOne(ctx, sc, map[string]typesafe.Question{
 		"refund_requested": typesafe.Noul("Does `ticket.messages[0].text` request a refund?"),
 		"policy_supports_refund": typesafe.Noul(
@@ -67,7 +67,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	exutil.Response(res)
+	exutil.PrintResponse(res)
 
 	// --- 2. instructions as an object -----------------------------------
 	exutil.Title("Structured instructions (question + reference data)")
@@ -94,7 +94,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	exutil.Response(res)
+	exutil.PrintResponse(res)
 
 	// --- 3. Array state -------------------------------------------------
 	exutil.Title("Array state (chat log)")
@@ -108,5 +108,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	exutil.Response(res)
+	exutil.PrintResponse(res)
 }

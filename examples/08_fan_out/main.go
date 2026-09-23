@@ -71,7 +71,7 @@ func main() {
 	} {
 		exutil.Title(ticket)
 		res := exutil.Timed("latency", func() (*typesafe.Response, error) { return c.SystemOne(ctx, ticket, questions) })
-		exutil.Response(res)
+		exutil.PrintResponse(res)
 		fmt.Printf("  ⇒ %s\n", triage(res.Answers))
 	}
 }

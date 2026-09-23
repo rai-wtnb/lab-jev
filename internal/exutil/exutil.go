@@ -61,22 +61,22 @@ func Timed[T any](label string, f func() (T, error)) T {
 	return v
 }
 
-// JSON pretty-prints a value (handy for inspecting request content).
-func JSON(label string, v any) {
+// PrintJSON pretty-prints a value (handy for inspecting request content).
+func PrintJSON(label string, v any) {
 	b, _ := json.MarshalIndent(v, "", "  ")
 	fmt.Printf("%s:\n%s\n", label, b)
 }
 
-// Response prints every answer, sorted by ID.
-func Response(res *typesafe.Response) {
+// PrintResponse prints every answer, sorted by ID.
+func PrintResponse(res *typesafe.Response) {
 	fmt.Printf("model=%s  usage: in=%d out=%d\n", res.Model, res.Usage.InputTokens, res.Usage.OutputTokens)
 	for _, id := range slices.Sorted(maps.Keys(res.Answers)) {
-		Answer(id, res.Answers[id])
+		printAnswer(id, res.Answers[id])
 	}
 }
 
-// Answer prints a single answer according to its type.
-func Answer(id string, a typesafe.Answer) {
+// printAnswer prints a single answer according to its type.
+func printAnswer(id string, a typesafe.Answer) {
 	switch a.Type {
 	case typesafe.TypeNoul:
 		fmt.Printf("  %-22s noul   %.3f %s\n", id, a.Noul, Bar(a.Noul))

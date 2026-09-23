@@ -37,6 +37,6 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		exutil.Response(res)
+		exutil.PrintResponse(res)
 	}
 }
