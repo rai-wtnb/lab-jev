@@ -1,0 +1,78 @@
+[tools]
+go = "1.27.1"
+
+[env]
+# Put TYPESAFE_API_KEY etc. in .env (copy .env.example)
+_.file = ".env"
+
+# ---- Dev tasks ------------------------------------------------------------
+
+[tasks.test]
+description = "Client unit tests (uses httptest, no API key needed)"
+run = "go test ./..."
+
+[tasks.vet]
+description = "go vet"
+run = "go vet ./..."
+
+[tasks.check]
+description = "gofmt check + vet + test"
+run = [
+  "test -z \"$(gofmt -l .)\" || (gofmt -l . && exit 1)",
+  "go vet ./...",
+  "go test ./...",
+]
+
+# ---- Examples (require TYPESAFE_API_KEY) ----------------------------------
+
+[tasks."ex:noul"]
+description = "01 Noul: probability of yes"
+run = "go run ./examples/01_noul"
+
+[tasks."ex:choice"]
+description = "02 Choice: pick one option"
+run = "go run ./examples/02_choice"
+
+[tasks."ex:score"]
+description = "03 Score: position on a rubric"
+run = "go run ./examples/03_score"
+
+[tasks."ex:multi"]
+description = "04 Multiple questions in one request"
+run = "go run ./examples/04_multi_questions"
+
+[tasks."ex:structured"]
+description = "05 Structured state / path references / structured instructions"
+run = "go run ./examples/05_structured_state"
+
+[tasks."ex:models"]
+description = "06 GET /v1/models"
+run = "go run ./examples/06_models"
+
+[tasks."ex:confidence"]
+description = "07 Confidence-gated routing"
+run = "go run ./examples/07_confidence_routing"
+
+[tasks."ex:fanout"]
+description = "08 Speculative fan-out"
+run = "go run ./examples/08_fan_out"
+
+[tasks."ex:composite"]
+description = "09 Composite scoring (concurrent requests over several states)"
+run = "go run ./examples/09_composite_scoring"
+
+[tasks."ex:intent"]
+description = "10 Intent routing"
+run = "go run ./examples/10_intent_routing"
+
+[tasks."ex:errors"]
+description = "11 Error handling (401 / 422)"
+run = "go run ./examples/11_errors"
+
+[tasks."ex:language"]
+description = "12 English vs Japanese comparison"
+run = "go run ./examples/12_language"
+
+[tasks."ex:all"]
+description = "Run every example in order"
+run = 'for d in examples/*/; do echo; echo "######## $d"; go run "./$d" || exit 1; done'
