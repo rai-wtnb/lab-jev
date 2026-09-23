@@ -90,7 +90,7 @@ func Answer(id string, a typesafe.Answer) {
 		fmt.Printf("  %-22s score  %.2f (top level: %d %q)  confidence=%.2f\n", id, a.Score, n, desc, a.Confidence)
 		for i := range len(a.Legend) {
 			k := fmt.Sprint(i)
-			fmt.Printf("  %-22s        %s %-40s %.3f %s\n", "", k, trunc(a.Legend[k], 40), a.Probabilities[k], Bar(a.Probabilities[k]))
+			fmt.Printf("  %-22s        %s %-40s %.3f %s\n", "", k, trunc(a.LevelText(k), 40), a.Probabilities[k], Bar(a.Probabilities[k]))
 		}
 	default:
 		fmt.Printf("  %-22s (unknown type %q) %+v\n", id, a.Type, a)

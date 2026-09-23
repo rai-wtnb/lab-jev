@@ -6,6 +6,8 @@ package typesafe
 
 import (
 	"cmp"
+	"encoding/json"
+	"fmt"
 	"slices"
 	"strconv"
 )
@@ -104,8 +106,10 @@ type Answer struct {
 	Choice string `json:"choice,omitempty"`
 
 	Score float64 `json:"score,omitempty"`
-	// Legend maps a Score level number ("0", "1", ...) to its description.
-	Legend map[string]string `json:"legend,omitempty"`
+	// Legend maps a Score level number ("0", "1", ...) to its description,
+	// echoed back as sent: a string, or an object/array for structured levels.
+	// Use LevelText to get a printable form.
+	Legend map[string]any `json:"legend,omitempty"`
 
 	// Probabilities maps option -> probability for a Choice, or
 	// level number -> probability for a Score. They sum to 1.
@@ -137,7 +141,24 @@ func (a Answer) Level() (int, string) {
 	if err != nil {
 		return -1, ""
 	}
-	return n, a.Legend[r[0].Key]
+	return n, a.LevelText(r[0].Key)
+}
+
+// LevelText returns the description of a Score level (key "0", "1", ...) as text.
+// String descriptions are returned as-is; structured ones as compact JSON.
+func (a Answer) LevelText(level string) string {
+	switch v := a.Legend[level].(type) {
+	case nil:
+		return ""
+	case string:
+		return v
+	default:
+		b, err := json.Marshal(v)
+		if err != nil {
+			return fmt.Sprint(v)
+		}
+		return string(b)
+	}
 }
 
 // NormalizedScore scales Score to 0..1 by the number of levels.

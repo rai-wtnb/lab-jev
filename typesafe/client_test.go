@@ -225,3 +225,45 @@ func TestAPIErrorDetail(t *testing.T) {
 		t.Errorf("type=%q message=%q", apiErr.Type, apiErr.Message)
 	}
 }
+
+// Structured level descriptions come back as objects in legend
+// (https://docs.typesafe.ai/primitives/score#structured-level-descriptions).
+func TestDecodeStructuredLegend(t *testing.T) {
+	c := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{
+		  "model": "jev-1.13.0",
+		  "answers": {
+		    "bug_severity": {"type": "score", "score": 1.09, "confidence": 0.87,
+		      "legend": {
+		        "0": {"what": "Cosmetic; no impact to functionality", "examples": ["typo in a label", "misaligned icon"]},
+		        "1": {"what": "Broken or degraded feature, but workaround exists", "examples": ["export fails in one browser but works in another"]},
+		        "2": {"what": "Blocking issue; no workaround exists", "examples": ["cannot log in", "data loss"]}
+		      },
+		      "probabilities": {"0": 0.0, "1": 0.91, "2": 0.09}}
+		  },
+		  "usage": {"input_tokens": 379, "output_tokens": 18}
+		}`)
+	})
+	res, err := c.SystemOne(context.Background(), "x", map[string]Question{
+		"bug_severity": Score("How severe is the reported issue?",
+			map[string]any{"what": "Cosmetic; no impact to functionality", "examples": []string{"typo in a label", "misaligned icon"}},
+			map[string]any{"what": "Broken or degraded feature, but workaround exists", "examples": []string{"export fails in one browser but works in another"}},
+			map[string]any{"what": "Blocking issue; no workaround exists", "examples": []string{"cannot log in", "data loss"}},
+		),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := res.Answers["bug_severity"]
+	n, desc := a.Level()
+	want := `{"examples":["export fails in one browser but works in another"],"what":"Broken or degraded feature, but workaround exists"}`
+	if n != 1 || desc != want {
+		t.Errorf("level = %d %s", n, desc)
+	}
+	if got := a.NormalizedScore(); got != 0.545 {
+		t.Errorf("normalized = %v", got)
+	}
+	if got := a.LevelText("9"); got != "" {
+		t.Errorf("missing level = %q", got)
+	}
+}
